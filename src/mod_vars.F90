@@ -46,7 +46,9 @@ MODULE mod_param
 
   INTEGER                                   :: write_frec         ! Writing frecuency
   INTEGER                                   :: write_form = 0     ! Writing format
-  INTEGER                                   :: icompresspart = 0  ! Compress part integer
+
+  LOGICAL                                   :: l_compress = .FALSE. ! Activate compression
+  INTEGER                                   :: icompresspart = 0   ! Compress part integer
 
   INTEGER                                   :: iter       ! Number of subcycles
   INTEGER                                   :: ngcm       ! Time step in hours
@@ -224,7 +226,7 @@ MODULE mod_grid
                                                usgs_name = '', vsgs_name = '', usub_name = '', vsub_name = '', &
                                                w_name = ''
 
-  CHARACTER(LEN=50)                         :: hgridFile, dy_name, dyu_name, dx_name, dxv_name, &
+  CHARACTER(LEN=50)                         :: hgridFile, darea_name, dy_name, dyu_name, dx_name, dxv_name, &
                                                zgridFile, dzt_name, dzu_name, dzv_name, dep_name, &
                                                bathyFile, kmt_name
 
