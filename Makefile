@@ -3,13 +3,14 @@
 #================================================================
 
 # Project and case definition
-PROJECT	          = NEMO
-CASE              = Arctic
+PROJECT	          = BLOM
+CASE              = test
 RUNFILE 	      = runtracmass
 ARCH              = nird
 
-NETCDFLIBS        = custom
-NCDF_ROOT         = ${HOME}/local/netcdf-fortran/4.5.3
+#NETCDFLIBS        = custom
+NETCDFLIBS        = automatic-44
+NCDF_ROOT         = ${EBROOTNETCDFMINFORTRAN}
 #================================================================
 
 # Possible architectures:
@@ -74,8 +75,10 @@ FC = ifort
 FF = -g -O3 -traceback -pg
 
 else ifeq ($(ARCH),nird)
-FC = gfortran
-FF = -g -O3 -fbacktrace -fbounds-check -Wall -Wno-maybe-uninitialized -Wno-unused-dummy-argument
+#FC = gfortran
+#FF = -g -O3 -fbacktrace -fbounds-check -Wall -Wno-maybe-uninitialized -Wno-unused-dummy-argument
+FC = ifort
+FF = -g -O3 -traceback -pg
 
 else
 FC = gfortran
