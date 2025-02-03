@@ -60,11 +60,11 @@
 /
 
 &INIT_GRID_TIME
-    ngcm_step       = 30,                            ! time between two time levels
+    ngcm_step       = 1,                            ! time between two time levels
                                                         ! if ncgcm_unit = 5, then ngcm_step = 3 means 3 months
     ngcm_unit       = 4,                            ! units of ngcm
                                                     
-    iter            = 20,                          ! number of subcycles between time levels stopped
+    iter            = 100,                          ! number of subcycles between time levels stopped
 /
 
 &INIT_START_DATE
@@ -93,7 +93,7 @@
 /
 
 &INIT_WRITE_TRAJ
-    write_frec    = 1                               ! 1 = write at time intervals of gcm datasets (each ints)
+    write_frec    = 3                               ! 1 = write at time intervals of gcm datasets (each ints)
                                                     ! 2 = write at each time iteration
                                                     ! 3 = write each spatial grid-crossing
                                                     ! 4 = write all the time steps
@@ -111,7 +111,7 @@
     isec          = 2,          ! = 1 start on zonal cell wall
                                     ! = 2 start on meridional cell wall
                                     ! = 3 start on vertical wall
-    idir          = -1,         ! = 1 start only when flux > 0
+    idir          = 1,          ! = 1 start only when flux > 0
                                     ! = -1      only when flux < 0
     nqua          = 1,          ! number of trajectories can be set by
                                     ! = 1 constant number of particles in all seeding cells
@@ -127,12 +127,12 @@
                                     ! = 2 seed using file with start positions
 
     ! when seedtype = 1
-    ist1          = 120,       ! seed in box in range i = [ist1,ist2]
-    ist2          = 140,        
-    jst1          = 360,            ! j = [jst1,jst2]
-    jst2          = 360,
-    kst1          = 35,              ! k = [kst1,kst2]
-    kst2          = 50,
+    ist1          = 94,       ! seed in box in range i = [ist1,ist2]
+    ist2          = 104,        
+    jst1          = 357,            ! j = [jst1,jst2]
+    jst2          = 357,
+    kst1          = 1,              ! k = [kst1,kst2]
+    kst2          = 53,
     ! when seedtype = 2
     seeddir       = '',         ! directory for seed files
     seedfile      = '',         ! name of seed file
@@ -143,7 +143,7 @@
 
     ! when seedtime = 1
     tst1          = 1,          ! seed only between tst1 and tst2
-    tst2          = 100,
+    tst2          = 10,
 
     ! when seedtime = 2
     timefile      = '',         ! name of seed file

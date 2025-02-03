@@ -4,7 +4,7 @@
 
 # Project and case definition
 PROJECT	          = BLOM
-CASE              = test
+CASE              = test6
 RUNFILE 	      = runtracmass
 ARCH              = nird
 
@@ -54,8 +54,10 @@ LIB_DIR = $(shell nc-config --flibs)
 INC_DIR = -I$(shell nc-config --includedir)
 
 else ifeq ($(NETCDFLIBS),automatic-44)
-LIB_DIR = $(shell nf-config --flibs)
-INC_DIR = $(shell nf-config --cflags)
+#LIB_DIR = $(shell nf-config --flibs)
+#INC_DIR = $(shell nf-config --cflags)
+LIB_DIR = -L$(NCDF_ROOT)/lib -lnetcdf -lnetcdff
+INC_DIR = -I$(NCDF_ROOT)/include
 
 else ifeq ($(NETCDFLIBS),custom)
 LIB_DIR = -L$(NCDF_ROOT)/lib -lnetcdf -lnetcdff
@@ -78,7 +80,7 @@ else ifeq ($(ARCH),nird)
 #FC = gfortran
 #FF = -g -O3 -fbacktrace -fbounds-check -Wall -Wno-maybe-uninitialized -Wno-unused-dummy-argument
 FC = ifort
-FF = -g -O3 -traceback -pg
+FF = -g -O3 -traceback -pg -check bounds
 
 else
 FC = gfortran
@@ -89,7 +91,8 @@ endif
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${NCDF_ROOT}/lib
 
 # Path to sources
-VPATH = src:projects/$(PROJECT):_build
+#VPATH = src:projects/$(PROJECT):_build
+VPATH = projects/$(PROJECT):src:_build
 
 all: runfile
 
