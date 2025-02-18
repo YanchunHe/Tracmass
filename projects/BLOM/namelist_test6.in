@@ -8,7 +8,7 @@
     l_onestep = .FALSE.
     
     ! Describe filenames
-    physDataDir     = '/projects/NS11009K/Models/NorESM2/NHISTfrc2_f09_tn14_20191025/ocn/hist/',
+    physDataDir     = '/nird/datalake/NS11009K/Models/NorESM2/NHISTfrc2_f09_tn14_20191025/ocn/hist/',
     physPrefixForm  = 'NHISTfrc2_f09_tn14_20191025.blom.hd.',
     dateformat      = 'YYYY-MM'
     ! tGridName     = 'gridT_',                     ! name of Tgrid, e.g. grid_T
@@ -64,7 +64,7 @@
                                                         ! if ncgcm_unit = 5, then ngcm_step = 3 means 3 months
     ngcm_unit       = 4,                            ! units of ngcm
                                                     
-    iter            = 100,                          ! number of subcycles between time levels stopped
+    iter            = 10,                          ! number of subcycles between time levels stopped
 /
 
 &INIT_START_DATE
@@ -83,17 +83,17 @@
     loopYears      = .TRUE.,                        ! make a time loop to run
                                                         ! e.g. 1000 years using only 100 years of data
     loopStartYear  = 1990,                          ! year to start loop from
-    loopEndYear    = 1991,                          ! last year of loop
+    loopEndYear    = 1990,                          ! last year of loop
 
     ! Verbose
     log_level      = 1                              ! precise 1->3->5 verbose
 
     ! Information of run time
-    intrun         = 48                             ! number of time steps for run
+    intrun         = 60                             ! number of time steps for run
 /
 
 &INIT_WRITE_TRAJ
-    write_frec    = 3                               ! 1 = write at time intervals of gcm datasets (each ints)
+    write_frec    = 1                               ! 1 = write at time intervals of gcm datasets (each ints)
                                                     ! 2 = write at each time iteration
                                                     ! 3 = write each spatial grid-crossing
                                                     ! 4 = write all the time steps
@@ -111,7 +111,7 @@
     isec          = 2,          ! = 1 start on zonal cell wall
                                     ! = 2 start on meridional cell wall
                                     ! = 3 start on vertical wall
-    idir          = 1,          ! = 1 start only when flux > 0
+    idir          = -1,          ! = 1 start only when flux > 0
                                     ! = -1      only when flux < 0
     nqua          = 1,          ! number of trajectories can be set by
                                     ! = 1 constant number of particles in all seeding cells
@@ -121,18 +121,18 @@
                                     ! = 3 Each particle reflects air/water mass/volume at seeding.
                                     !     set by partQuant in m3 or kg per particle
 
-    partquant     = 1,              ! particles/gridcell or m3s-1/particle or m3/particle
+    partquant     = 5,             ! particles/gridcell or m3s-1/particle or m3/particle
     loneparticle  = 0,              ! start only one trajectory for debugging
     seedtype      = 1,          ! = 1 seed using ist,jst,kst (below)
                                     ! = 2 seed using file with start positions
 
     ! when seedtype = 1
-    ist1          = 94,       ! seed in box in range i = [ist1,ist2]
+    ist1          = 93,       ! seed in box in range i = [ist1,ist2]
     ist2          = 104,        
     jst1          = 357,            ! j = [jst1,jst2]
     jst2          = 357,
     kst1          = 1,              ! k = [kst1,kst2]
-    kst2          = 53,
+    kst2          = 1,
     ! when seedtype = 2
     seeddir       = '',         ! directory for seed files
     seedfile      = '',         ! name of seed file

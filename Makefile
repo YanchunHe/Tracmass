@@ -4,7 +4,7 @@
 
 # Project and case definition
 PROJECT	          = BLOM
-CASE              = test6
+CASE              = faroe-norway
 RUNFILE 	      = runtracmass
 ARCH              = nird
 
@@ -80,7 +80,8 @@ else ifeq ($(ARCH),nird)
 #FC = gfortran
 #FF = -g -O3 -fbacktrace -fbounds-check -Wall -Wno-maybe-uninitialized -Wno-unused-dummy-argument
 FC = ifort
-FF = -g -O3 -traceback -pg -check bounds
+#FF = -g -O3 -traceback -pg -check bounds
+FF = -O2 -traceback -pg -check bounds
 
 else
 FC = gfortran

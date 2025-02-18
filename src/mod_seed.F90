@@ -710,7 +710,7 @@ MODULE mod_seed
                         ikt = jsg
                     END IF
 
-                    print*, num, ijt, ikt
+                    print*, 'num, ijt, ikt:', num, ijt, ikt
 
                 END IF
 

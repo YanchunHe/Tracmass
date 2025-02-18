@@ -41,8 +41,8 @@ SUBROUTINE setup_grid
     ! Grid area
     dxdy = get2DfieldNC(TRIM(topoDataDir)//TRIM(hgridFile), 'parea',[imindom,jmindom,1,1],[imt,jmt,1,1],'st')
 
-    write(*,*) 'min(dxdy):',minval(dxdy)
-    write(*,*) 'max(dxdy):',maxval(dxdy)
+!   write(*,*) 'min(dxdy):',minval(dxdy)
+!   write(*,*) 'max(dxdy):',maxval(dxdy)
 
     ! Sensitivity to dz value
     !ALLOCATE(dzt(imt,jmt,km,1))

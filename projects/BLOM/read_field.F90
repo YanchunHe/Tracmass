@@ -63,7 +63,7 @@ SUBROUTINE read_field
    !write(*,*) 'dateprefix:',dateprefix
 
    fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
-   !write(*,*) 'fieldFile:', fieldFile
+   !write(*,*) 'reading fieldFile:', fieldFile
 
    !write(*,*) 'imindom:',imindom
    !write(*,*) 'jmindom:',jmindom
@@ -77,6 +77,7 @@ SUBROUTINE read_field
      tmp3d(1:imt,1:jmt,1:km)  = get3DfieldNC(fieldFile, usgs_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
      uvel(1:imt,1:jmt,1:km) = uvel(1:imt,1:jmt,1:km) + tmp3d(1:imt,1:jmt,1:km)
    END IF
+   uvel(1:imt,1:jmt,1:km) = uvel(1:imt,1:jmt,1:km)/1000.    !kg/s -> m3/s
 
    !vvel(1:imt,1:jmt,km:1:-1) = get3DfieldNC(fieldFile, veul_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
    vvel(1:imt,1:jmt,1:km) = get3DfieldNC(fieldFile, veul_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
@@ -86,12 +87,14 @@ SUBROUTINE read_field
      tmp3d(1:imt,1:jmt,1:km) = get3DfieldNC(fieldFile, vsgs_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
      vvel(1:imt,1:jmt,1:km) = vvel(1:imt,1:jmt,1:km) + tmp3d(1:imt,1:jmt,1:km)
    END IF
+   vvel(1:imt,1:jmt,1:km) = vvel(1:imt,1:jmt,1:km)/1000.    !kg/s -> m3/s
 
     ! dz
     !ALLOCATE(dzt(imt,jmt,km,1))
     dzt(:,:,:,1) = get3DfieldNC(fieldFile, dzt_name,[imindom,jmindom,1,1],[imt,jmt,km,1],'st')
     where (dzt < 100 ) dzt = 100.
     !where (dzt > 9.0E+036) dzt = 0.
+    dzt(:,:,:,1) = dzt(:,:,:,1)/1.e4
 
     !write(*,*) 'minval(dzt):',minval(dzt)
     !write(*,*) 'sum(dzt):',sum(dzt)

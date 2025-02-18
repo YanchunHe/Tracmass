@@ -175,14 +175,6 @@ MODULE mod_loop
 
             ! Interpolate volume
             dxyz = dxdy(ib,jb)*(intrpg * dzt(ib,jb,kb,nsp)*zstot(ib,jb,0) + intrpr * dzt(ib,jb,kb,nsm)*zstot(ib,jb,-1))
-            !write(*,*) 'dxdy(ib,jb):',dxdy(ib,jb)
-            !write(*,*) 'dzt(ib,jb,kb,nsp):',dzt(ib,jb,kb,nsp)
-            !write(*,*) 'dzt(ib,jb,kb,nsm):',dzt(ib,jb,kb,nsm)
-            !write(*,*) 'minval(dzt):',minval(dzt)
-            !write(*,*) 'maxval(dzt):',maxval(dzt)
-            !write(*,*) 'intrpg:',intrpg
-            !write(*,*) 'zstot:',zstot(ib,jb,0)
-            !write(*,*) 'dxyz:',dxyz
 
             CALL errorCheck('dxyzError'     ,errCode)
             IF (errCode .NE. 0) CYCLE ntracLoop
