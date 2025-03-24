@@ -47,6 +47,85 @@ SUBROUTINE read_field
    ! Data files
    dateprefix = ' '
 
+   ! Reading 3-time step variables
+   ! In this case: hs and zstot
+   ! ===========================================================================
+   IF (ints == 0) THEN
+
+     ! 1 - Past
+     IF (loopYears) THEN
+
+       nctstep = prevMon
+       IF (l_onestep) nctstep = 1
+
+       dateprefix = filledFileName(dateFormat, prevYear, prevMon, prevDay)
+
+       !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(tGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
+       fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
+       !WRITE(*,*) 'pass file:',fieldFile
+       hs(1:imt,1:jmt,-1) = get2DfieldNC(fieldFile, hs_name,[imindom,jmindom,nctstep,1],[imt,jmt,1,1],'st')
+       hs(imt+1,:,-1)     = hs(1,:,-1)
+
+     END IF
+
+     ! 2 - Present
+     nctstep = currMon
+     IF (l_onestep) nctstep = 1
+
+     dateprefix = filledFileName(dateFormat, currYear, currMon, currDay)
+
+     !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(tGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
+     fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
+       !WRITE(*,*) 'present file:',fieldFile
+     hs(1:imt,1:jmt,0) = get2DfieldNC(fieldFile, hs_name,[imindom,jmindom,nctstep,1],[imt,jmt,1,1],'st')
+     hs(imt+1,:,0)     = hs(1,:,0)
+
+     WHERE (SUM(dzt(:,:,:,2),3) /= 0)
+          zstot(1:imt,1:jmt,-1) = hs(1:imt,1:jmt,-1)/SUM(dzt(:,:,:,2),3) + 1
+          zstot(1:imt,1:jmt, 0) = hs(1:imt,1:jmt, 0)/SUM(dzt(:,:,:,2),3) + 1
+     ELSEWHERE
+          zstot(:,:,-1) = 0.d0
+          zstot(:,:, 0) = 0.d0
+     END WHERE
+
+   END IF
+
+   ! 3 - Future
+   IF (ints<intrun-1 .OR. loopYears) THEN
+
+     nctstep = nextMon
+     IF (l_onestep) nctstep = 1
+
+     dateprefix = filledFileName(dateFormat, nextYear, nextMon, nextDay)
+
+     !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(tGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
+     fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
+       !WRITE(*,*) 'future file:',fieldFile
+     hs(1:imt,1:jmt,1) = get2DfieldNC(fieldFile, hs_name,[imindom,jmindom,nctstep,1],[imt,jmt,1,1],'st')
+     hs(imt+1,:,1)     = hs(1,:,1)
+
+   END IF
+
+   ! Calculate SSH/depth
+   WHERE (SUM(dzt(:,:,:,2),3) /= 0)
+        zstot(1:imt,1:jmt,1)  = hs(1:imt,1:jmt,1)/SUM(dzt(:,:,:,2),3) + 1
+   ELSEWHERE
+        zstot(:,:,1) = 0.d0
+   END WHERE
+
+   WHERE (SUM(dzu(:,:,:,2),3) /= 0)
+        zstou(1:imt,1:jmt) = 0.5*(hs(1:imt,1:jmt,0)+hs(2:imt+1,1:jmt,0))/SUM(dzu(:,:,:,2),3) + 1
+   ELSEWHERE
+        zstou = 0.d0
+   END WHERE
+
+
+   WHERE (SUM(dzv(:,1:jmt-1,:,2),3) /= 0)
+        zstov(1:imt,1:jmt-1) = 0.5*(hs(1:imt,1:jmt-1,0)+hs(1:imt,2:jmt,0))/SUM(dzv(:,1:jmt-1,:,2),3) + 1
+   ELSEWHERE
+        zstov = 0.d0
+   END WHERE
+
    ALLOCATE(tmptracer(imt,jmt,km),tmpuflux(imt,0:jmt,km), tmpvflux(imt,0:jmt,km))
    !ALLOCATE(tmp3d(imt,0:jmt,km), tmp2d(imt,0:jmt))
 
@@ -90,15 +169,11 @@ SUBROUTINE read_field
    vvel(1:imt,1:jmt,1:km) = vvel(1:imt,1:jmt,1:km)/1000.    !kg/s -> m3/s
 
     ! dz
-    !ALLOCATE(dzt(imt,jmt,km,1))
     dzt(:,:,:,1) = get3DfieldNC(fieldFile, dzt_name,[imindom,jmindom,1,1],[imt,jmt,km,1],'st')
-    where (dzt < 100 ) dzt = 100.
+    !where (dzt < 100 ) dzt = 100.
     !where (dzt > 9.0E+036) dzt = 0.
     dzt(:,:,:,1) = dzt(:,:,:,1)/1.e4
 
-    !write(*,*) 'minval(dzt):',minval(dzt)
-    !write(*,*) 'sum(dzt):',sum(dzt)
-    !write(*,*) 'maxval(dzt):',maxval(dzt)
 
    !! Tracers
    IF (l_tracers) THEN
@@ -165,19 +240,17 @@ SUBROUTINE read_field
    ! ===========================================================================
 
    ! uflux and vflux computation
-   !FORALL (kk = 1:km) uflux(:,:,kk,2)     = uvel(:,:,kk)*dyu(:,:)*dzu(:,:,kk,2)*zstou(:,:)
-   !FORALL (kk = 1:km) vflux(:,1:jmt,kk,2) = vvel(:,1:jmt,kk)*dxv(:,1:jmt)*dzv(:,1:jmt,kk,2)*zstov(:,:)
    FORALL (kk = 1:km) uflux(:,:,kk,2)     = uvel(:,:,kk)
    FORALL (kk = 1:km) vflux(:,1:jmt,kk,2) = vvel(:,1:jmt,kk)
 
    ! dzdt calculation
-   !IF (ints == 0 .AND. ( loopYears .EQV..FALSE.)) THEN
-      !FORALL (kk = 1:km) dzdt(:,:,kk,2) = dzt(:,:,kk,2)*(zstot(:,:,1) - zstot(:,:,0))/tseas
-   !ELSE IF (ints == intrun-1 .AND. ( loopYears .EQV..FALSE.)) THEN
-      !FORALL (kk = 1:km) dzdt(:,:,kk,2) = dzt(:,:,kk,2)*(zstot(:,:,0) - zstot(:,:,-1))/tseas
-   !ELSE
-      !FORALL (kk = 1:km) dzdt(:,:,kk,2) = 0.5*dzt(:,:,kk,2)*(zstot(:,:,1) - zstot(:,:,-1))/tseas
-   !END IF
+!  IF (ints == 0 .AND. ( loopYears .EQV..FALSE.)) THEN
+!     FORALL (kk = 1:km) dzdt(:,:,kk,2) = dzt(:,:,kk,2)*(zstot(:,:,1) - zstot(:,:,0))/tseas
+!  ELSE IF (ints == intrun-1 .AND. ( loopYears .EQV..FALSE.)) THEN
+!     FORALL (kk = 1:km) dzdt(:,:,kk,2) = dzt(:,:,kk,2)*(zstot(:,:,0) - zstot(:,:,-1))/tseas
+!  ELSE
+!     FORALL (kk = 1:km) dzdt(:,:,kk,2) = 0.5*dzt(:,:,kk,2)*(zstot(:,:,1) - zstot(:,:,-1))/tseas
+!  END IF
 
    !! Zero meridional flux at j=0 and j=jmt
    vflux(:,0  ,:,:) = 0.d0

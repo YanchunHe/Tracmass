@@ -9,7 +9,7 @@ fl01  = -Dw_3dim       # Compute 3D vertical velocities.
 
 # Time integration scheme
 #------------------------------------------------------------------------
-#fl02 = -Dtime_analytical
+fl02 = -Dtime_analytical
 
 #========================================================================
 

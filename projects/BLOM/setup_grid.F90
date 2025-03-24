@@ -40,6 +40,7 @@ SUBROUTINE setup_grid
 
     ! Grid area
     dxdy = get2DfieldNC(TRIM(topoDataDir)//TRIM(hgridFile), 'parea',[imindom,jmindom,1,1],[imt,jmt,1,1],'st')
+    mask = get2DfieldNC(TRIM(topoDataDir)//TRIM(hgridFile), 'pmask',[imindom,jmindom,1,1],[imt,jmt,1,1],'st')
 
 !   write(*,*) 'min(dxdy):',minval(dxdy)
 !   write(*,*) 'max(dxdy):',maxval(dxdy)

@@ -42,7 +42,7 @@
     dx_name         = 'pdx'                         ! name of dx at T point
     dxv_name        = 'vdx'                         !         dx at V point
 
-    ! zgridFile       = ''                          ! file with dz etc.
+    zgridFile       = 'NHISTfrc2_f09_tn14_20191025.blom.hd.1990-01.nc'                          ! file with dz etc.
     dzt_name        = 'dp'                       ! name of 3D dz at T point
     ! dzu_name        = 'dp'                       ! --- " ---  dz at U point
     ! dzv_name        = 'dp'                       ! --- " ---  dz at V point
