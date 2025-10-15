@@ -20,7 +20,7 @@ SUBROUTINE kill_zones
 
   IMPLICIT NONE
 
-  INTEGER  :: nexit, itrac, numexit
+  INTEGER            :: nexit, itrac, numexit
 
   nend = -1
 
@@ -79,7 +79,22 @@ SUBROUTINE kill_zones
   ! This must be hard coded below.
 
   CASE(4)
-      PRINT*, 'Hard coded limits of the domain'
+      ! This will now kill everything one index BELOW the section.
+      DO nexit = 1, SIZE(killi)
+         !IF (x1 == killi(nexit) .AND. &
+         !    y1 >= killj(nexit) - 1 .AND. y1 <= killj(nexit)) THEN
+         !      nend = nexit + 1
+         !      EXIT 
+         !ELSE IF (y1 == killj(nexit) .AND. x1 >= killi(nexit) - 1 .AND. &
+         !    x1 <= killi(nexit)) THEN
+         !      nend = nexit + 1
+         !      EXIT 
+         IF (x1 >= killi(nexit) - 1 .AND. x1 <= killi(nexit) .AND. &
+             y1 >= killj(nexit) - 1 .AND. y1 <= killj(nexit)) THEN
+               nend = nexit + 1
+               EXIT 
+         END IF
+      END DO
 
   END SELECT
 

@@ -1,3 +1,4 @@
+! 3D, 1 parcel at Fram Strait, 1995 loop x 5, selfmade meshfiles
 &INIT_GRID_DESCRIPTION
     ! Direction of the grid (1 - E->W, S->N, B->U)
     griddir = 1,1,-1
@@ -8,7 +9,7 @@
     l_onestep = .TRUE.
     
     ! Describe filenames
-    physDataDir     = '/Data/gfi/share/Reanalyses/GLORYS12V1/native_grid/input/',
+    physDataDir     = '/Data/gfi/share/Reanalyses/GLORYS12V1/native/',
                                                     ! directory of physical data (u,v,T,S,MLD,etc)
     physPrefixForm  = 'glorys12v1-monthly-',
     dateformat      = 'YYYYMM'
@@ -29,13 +30,13 @@
 &INIT_GRID_SIZE
     ! Size of global grid
     imt             = 4322,                         ! number of global i points
-    jmt             = 699,                         ! number of global j points
+    jmt             = 3059,                         ! number of global j points
     km              = 50,                           ! number of global k points
 
-    iperio          = 0                             ! zonal periodic
+    iperio          = 1                             ! zonal periodic
     jperio          = 1                             ! meridional boundary conditions
 
-    topoDataDir     = '/Data/gfi/share/Reanalyses/GLORYS12V1/native_grid/input/',
+    topoDataDir     = '/Data/gfi/share/Reanalyses/GLORYS12V1/native/',
                                                     ! directory of grid data
 
     hgridFile       = 'mesh_h.nc'
@@ -94,7 +95,7 @@
     log_level      = 1                              ! precise 1->3->5 verbose
 
     ! Information of run time
-    intrun         = 120                             ! number of time steps for run
+    intrun         = 60                             ! number of time steps for run
 /
 
 &INIT_WRITE_TRAJ
@@ -134,13 +135,13 @@
 
     ! when seedtype = 1
 
-    ist1          = 3387,       ! seed in box in range i = [ist1,ist2]
-    ist2          = 3388,        
-    jst1          = 665,            ! j = [jst1,jst2]
-    jst2          = 665,
+    ist1          = 3361,       ! seed in box in range i = [ist1,ist2]
+    ist2          = 3362,        
+    jst1          = 2763,            ! j = [jst1,jst2]
+    jst2          = 2764,
 
-    kst1          = 26,              ! k = [kst1,kst2]
-    kst2          = 27,
+    kst1          = 20,              ! k = [kst1,kst2]
+    kst2          = 21,
     ! when seedtype = 2
     seeddir       = '',         ! directory for seed files
     seedfile      = '',         ! name of seed file
