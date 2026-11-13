@@ -39,90 +39,11 @@ SUBROUTINE read_field
    REAL(DP), ALLOCATABLE, DIMENSION(:,:,:)  :: tmp3d
    CHARACTER (len=200)                      :: fieldFile, dateprefix
 
-   ! Reassign the time index of uflux and vflux, dzt, dzdt, hs, ...
+   ! Reassign the time index of uflux and vflux, dzt, ...
    CALL swap_time()
 
    ! Data files
    dateprefix = ' '
-
-   ! Reading 3-time step variables
-   ! In this case: hs and zstot
-   ! ===========================================================================
-   IF (ints == 0) THEN
-
-     ! 1 - Past
-     IF (loopYears) THEN
-
-       nctstep = prevMon
-       IF (l_onestep) nctstep = 1
-
-       dateprefix = filledFileName(dateFormat, prevYear, prevMon, prevDay)
-
-       fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(tGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
-       !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
-       !WRITE(*,*) 'pass file:',fieldFile
-       hs(1:imt,1:jmt,-1) = get2DfieldNC(fieldFile, hs_name,[imindom,jmindom,nctstep,1],[imt,jmt,1,1],'st')
-       hs(imt+1,:,-1)     = hs(1,:,-1)
-
-     END IF
-
-     ! 2 - Present
-     nctstep = currMon
-     IF (l_onestep) nctstep = 1
-
-     dateprefix = filledFileName(dateFormat, currYear, currMon, currDay)
-
-     fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(tGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
-     !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
-       !WRITE(*,*) 'present file:',fieldFile
-     hs(1:imt,1:jmt,0) = get2DfieldNC(fieldFile, hs_name,[imindom,jmindom,nctstep,1],[imt,jmt,1,1],'st')
-     hs(imt+1,:,0)     = hs(1,:,0)
-
-     WHERE (SUM(dzt(:,:,:,2),3) /= 0)
-          zstot(1:imt,1:jmt,-1) = hs(1:imt,1:jmt,-1)/SUM(dzt(:,:,:,2),3) + 1
-          zstot(1:imt,1:jmt, 0) = hs(1:imt,1:jmt, 0)/SUM(dzt(:,:,:,2),3) + 1
-     ELSEWHERE
-          zstot(:,:,-1) = 0.d0
-          zstot(:,:, 0) = 0.d0
-     END WHERE
-
-   END IF
-
-   ! 3 - Future
-   IF (ints<intrun-1 .OR. loopYears) THEN
-
-     nctstep = nextMon
-     IF (l_onestep) nctstep = 1
-
-     dateprefix = filledFileName(dateFormat, nextYear, nextMon, nextDay)
-
-     fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(tGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
-     !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
-       !WRITE(*,*) 'future file:',fieldFile
-     hs(1:imt,1:jmt,1) = get2DfieldNC(fieldFile, hs_name,[imindom,jmindom,nctstep,1],[imt,jmt,1,1],'st')
-     hs(imt+1,:,1)     = hs(1,:,1)
-
-   END IF
-
-   ! Calculate SSH/depth
-   WHERE (SUM(dzt(:,:,:,2),3) /= 0)
-        zstot(1:imt,1:jmt,1)  = hs(1:imt,1:jmt,1)/SUM(dzt(:,:,:,2),3) + 1
-   ELSEWHERE
-        zstot(:,:,1) = 0.d0
-   END WHERE
-
-   WHERE (SUM(dzu(:,:,:,2),3) /= 0)
-        zstou(1:imt,1:jmt) = 0.5*(hs(1:imt,1:jmt,0)+hs(2:imt+1,1:jmt,0))/SUM(dzu(:,:,:,2),3) + 1
-   ELSEWHERE
-        zstou = 0.d0
-   END WHERE
-
-
-   WHERE (SUM(dzv(:,1:jmt-1,:,2),3) /= 0)
-        zstov(1:imt,1:jmt-1) = 0.5*(hs(1:imt,1:jmt-1,0)+hs(1:imt,2:jmt,0))/SUM(dzv(:,1:jmt-1,:,2),3) + 1
-   ELSEWHERE
-        zstov = 0.d0
-   END WHERE
 
    ! Reading 2-time step variables
    ! In this case: velocities and tracers
@@ -135,7 +56,6 @@ SUBROUTINE read_field
    dateprefix = filledFileName(dateFormat, currYear, currMon, currDay)
 
    fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(uGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
-   !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
    uvel(1:imt,1:jmt,km:1:-1) = get3DfieldNC(fieldFile, ueul_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
 
    IF (usgs_name/='') THEN
@@ -144,7 +64,6 @@ SUBROUTINE read_field
    END IF
 
    fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(vGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
-   !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
    vvel(1:imt,1:jmt,km:1:-1) = get3DfieldNC(fieldFile, veul_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
 
    IF (vsgs_name/='') THEN
@@ -152,6 +71,20 @@ SUBROUTINE read_field
      vvel(1:imt,1:jmt,1:km) = vvel(1:imt,1:jmt,1:km) + tmp3d(1:imt,1:jmt,1:km)
    END IF
 
+   ! vertical flux
+#if defined w_explicit
+     
+     ! Manually allocate wvel
+     IF (.not. ALLOCATED(wvel)) THEN
+       ALLOCATE ( wvel(imt,jmt,km))
+       wvel(:,:,:) = 0.
+     ENDIF
+     
+     !PRINT *,dateprefix
+     fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(wGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
+     wvel(1:imt,1:jmt,km:1:-1) = get3DfieldNC(fieldFile, w_name,[imindom,jmindom,1,nctstep],[imt,jmt,km,1],'st')
+#endif
+   
    !! Tracers
    IF (l_tracers) THEN
 
@@ -163,8 +96,12 @@ SUBROUTINE read_field
         IF (tracers(itrac)%action == 'read') THEN
 
             ! Read the tracer from a netcdf file
-            fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(TGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
-            !fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(dateprefix)//TRIM(fileSuffix)
+            IF (tracers(itrac)%varname == 'somxl010') THEN
+                fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//'grid2D_'//TRIM(dateprefix)//TRIM(fileSuffix)
+            ELSE
+                fieldFile = TRIM(physDataDir)//TRIM(physPrefixForm)//TRIM(TGridName)//TRIM(dateprefix)//TRIM(fileSuffix)
+            ENDIF
+            
             IF (tracers(itrac)%dimension == '3D') THEN
                 tmp3d(1:imt,1:jmt,km:1:-1) = get3DfieldNC(fieldFile, tracers(itrac)%varname,[imindom,jmindom,1,nctstep] &
                           ,[imt,jmt,km,1],'st')
@@ -196,17 +133,15 @@ SUBROUTINE read_field
    ! ===========================================================================
 
    ! uflux and vflux computation
-   FORALL (kk = 1:km) uflux(:,:,kk,2)     = uvel(:,:,kk)*dyu(:,:)*dzu(:,:,kk,2)*zstou(:,:)
-   FORALL (kk = 1:km) vflux(:,1:jmt,kk,2) = vvel(:,1:jmt,kk)*dxv(:,1:jmt)*dzv(:,1:jmt,kk,2)*zstov(:,:)
-
-   ! dzdt calculation
-   IF (ints == 0 .AND. ( loopYears .EQV..FALSE.)) THEN
-      FORALL (kk = 1:km) dzdt(:,:,kk,2) = dzt(:,:,kk,2)*(zstot(:,:,1) - zstot(:,:,0))/tseas
-   ELSE IF (ints == intrun-1 .AND. ( loopYears .EQV..FALSE.)) THEN
-      FORALL (kk = 1:km) dzdt(:,:,kk,2) = dzt(:,:,kk,2)*(zstot(:,:,0) - zstot(:,:,-1))/tseas
-   ELSE
-      FORALL (kk = 1:km) dzdt(:,:,kk,2) = 0.5*dzt(:,:,kk,2)*(zstot(:,:,1) - zstot(:,:,-1))/tseas
-   END IF
+   FORALL (kk = 1:km) uflux(:,:,kk,2)     = uvel(:,:,kk)*dyu(:,:)*dzu(:,:,kk,2)
+   FORALL (kk = 1:km) vflux(:,1:jmt,kk,2) = vvel(:,1:jmt,kk)*dxv(:,1:jmt)*dzv(:,1:jmt,kk,2)
+   
+   WHERE (ISNAN(vflux)) vflux = 0.
+   WHERE (ISNAN(uflux)) uflux = 0.
+#if defined w_explicit
+     FORALL (kk = 1:km) wflux(:,:,kk,2)     = wvel(:,:,kk)*dxdy(:,:)
+     WHERE (ISNAN(wflux)) wflux = 0.
+#endif
 
    !! Zero meridional flux at j=0 and j=jmt
    vflux(:,0  ,:,:) = 0.d0
@@ -214,6 +149,5 @@ SUBROUTINE read_field
 
    ! Reverse the sign of fluxes if trajectories are run backward in time.
    CALL swap_sign()
-
 
 END SUBROUTINE read_field
